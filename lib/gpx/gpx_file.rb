@@ -195,11 +195,11 @@ module GPX
       def update_meta_data(trk, get_bounds = true)
          @lowest_point   = trk.lowest_point if (
             @lowest_point.nil? or 
-            (!@lowest_point.nil? && !trk.lowest_point.nil? && trk.lowest_point.elevation < @lowest_point.elevation)
+            (!trk.lowest_point.nil? && trk.lowest_point.elevation < @lowest_point.elevation)
          )
          @highest_point  = trk.highest_point if (
             @highest_point.nil? or 
-            (!@highest_point.nil? && !trk.highest_point.nil? && trk.highest_point.elevation > @highest_point.elevation)
+            (!trk.highest_point.nil? && trk.highest_point.elevation > @highest_point.elevation)
          )
          @bounds.add(trk.bounds) if get_bounds
          @distance += trk.distance
