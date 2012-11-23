@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2006  Doug Fales 
+# Copyright (c) 2006  Doug Fales
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -29,7 +29,7 @@ module GPX
    class Segment < Base
 
       attr_reader :earliest_point, :latest_point, :bounds, :highest_point, :lowest_point, :distance
-      attr_accessor :points, :track 
+      attr_accessor :points, :track
 
       # If a XML::Node object is passed-in, this will initialize a new
       # Segment based on its contents.  Otherwise, a blank Segment is created.
@@ -47,15 +47,15 @@ module GPX
             segment_element = opts[:element]
             last_pt = nil
             if segment_element.is_a?(Hpricot::Elem)
-               segment_element.search("//trkpt").each do |trkpt| 
-                  pt = TrackPoint.new(:element => trkpt, :segment => self, :gpx_file => @gpx_file)  
+               segment_element.search("//trkpt").each do |trkpt|
+                  pt = TrackPoint.new(:element => trkpt, :segment => self, :gpx_file => @gpx_file)
                   unless pt.time.nil?
-                     @earliest_point = pt if(@earliest_point.nil? or pt.time < @earliest_point.time)
-                     @latest_point   = pt if(@latest_point.nil? or pt.time > @latest_point.time)
+                     @earliest_point = pt if GPX::Util.earlier_time?(@earliest_point, pt)
+                     @latest_point   = pt if GPX::Util.latter_time?(@latest_point, pt)
                   end
                   unless pt.elevation.nil?
-                     @lowest_point   = pt if(@lowest_point.nil? or pt.elevation < @lowest_point.elevation)
-                     @highest_point  = pt if(@highest_point.nil? or pt.elevation > @highest_point.elevation)
+                     @lowest_point   = pt if GPX::Util.lower_elevation?(@lowest_point, pt)
+                     @highest_point  = pt if GPX::Util.higher_elevation?(@highest_point, pt)
                   end
                   @bounds.min_lat = pt.lat if pt.lat < @bounds.min_lat
                   @bounds.min_lon = pt.lon if pt.lon < @bounds.min_lon
@@ -74,10 +74,10 @@ module GPX
       # Tack on a point to this Segment.  All meta-data will be updated.
       def append_point(pt)
          last_pt = @points[-1]
-         @earliest_point = pt if(@earliest_point.nil? or pt.time < @earliest_point.time)
-         @latest_point   = pt if(@latest_point.nil? or pt.time > @latest_point.time)
-         @lowest_point   = pt if(@lowest_point.nil? or pt.elevation < @lowest_point.elevation)
-         @highest_point  = pt if(@highest_point.nil? or pt.elevation > @highest_point.elevation)
+         @earliest_point = pt if GPX::Util.earlier_time?(@earliest_point, pt)
+         @latest_point   = pt if GPX::Util.latter_time?(@latest_point, pt)
+         @lowest_point   = pt if GPX::Util.lower_elevation?(@lowest_point, pt)
+         @highest_point  = pt if GPX::Util.higher_elevation?(@highest_point, pt)
          @bounds.min_lat = pt.lat if pt.lat < @bounds.min_lat
          @bounds.min_lon = pt.lon if pt.lon < @bounds.min_lon
          @bounds.max_lat = pt.lat if pt.lat > @bounds.max_lat
@@ -117,7 +117,7 @@ module GPX
          reset_meta_data
          keep_points = []
          last_pt = nil
-         points.each do |pt| 
+         points.each do |pt|
             unless yield(pt)
                keep_points << pt
                update_meta_data(pt, last_pt)
@@ -175,7 +175,7 @@ module GPX
       RADIUS = 6371; # earth's mean radius in km
 
       # Calculate the Haversine distance between two points. This is the method
-      # the library uses to calculate the cumulative distance of GPX files. 
+      # the library uses to calculate the cumulative distance of GPX files.
       def haversine_distance(p1, p2)
          d_lat = p2.latr - p1.latr;
          d_lon = p2.lonr - p1.lonr;
@@ -206,12 +206,12 @@ module GPX
 
       def update_meta_data(pt, last_pt)
          unless pt.time.nil?
-            @earliest_point = pt if(@earliest_point.nil? or pt.time < @earliest_point.time)
-            @latest_point   = pt if(@latest_point.nil? or pt.time > @latest_point.time)
+           @earliest_point = pt if GPX::Util.earlier_time?(@earliest_point, pt)
+           @latest_point   = pt if GPX::Util.latter_time?(@latest_point, pt)
          end
          unless pt.elevation.nil?
-            @lowest_point   = pt if(@lowest_point.nil? or pt.elevation < @lowest_point.elevation)
-            @highest_point  = pt if(@highest_point.nil? or pt.elevation > @highest_point.elevation)
+           @lowest_point   = pt if GPX::Util.lower_elevation?(@lowest_point, pt)
+           @highest_point  = pt if GPX::Util.higher_elevation?(@highest_point, pt)
          end
          @bounds.add(pt)
          @distance += haversine_distance(last_pt, pt) unless last_pt.nil?

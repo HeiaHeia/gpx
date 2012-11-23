@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2006  Doug Fales 
+# Copyright (c) 2006  Doug Fales
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,6 +27,7 @@ require 'date'
 require 'time'
 require 'csv'
 require 'gpx/gpx'
+require 'gpx/util'
 require 'gpx/gpx_file'
 require 'gpx/bounds'
 require 'gpx/track'
@@ -36,3 +37,4 @@ require 'gpx/point'
 require 'gpx/trackpoint'
 require 'gpx/waypoint'
 require 'gpx/magellan_track_log'
+
