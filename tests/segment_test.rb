@@ -6,6 +6,7 @@ require 'gpx'
 class SegmentTest < Minitest::Test
    ONE_SEGMENT = File.join(File.dirname(__FILE__), "gpx_files/one_segment.gpx")
    ONE_SEGMENT_NO_TIME = File.join(File.dirname(__FILE__), "gpx_files/one_segment_no_time.gpx")
+   ONE_SEGMENT_ZERO_LAT_LON = File.join(File.dirname(__FILE__), "gpx_files/one_segment_zero_lat_lon.gpx")
 
    def setup
       @gpx_file = GPX::GPXFile.new(:gpx_file => ONE_SEGMENT)
@@ -32,6 +33,18 @@ class SegmentTest < Minitest::Test
       assert_equal(1480.087, segment_no_time.highest_point.elevation)
       assert_in_delta(6.98803359528853, segment_no_time.distance, 0.001)
       assert_equal(0, segment_no_time.duration)
+   end
+
+   def test_segment_read_zero_lat_lon
+      gpx_file_zero_lat_lon = GPX::GPXFile.new(:gpx_file => ONE_SEGMENT_ZERO_LAT_LON)
+      segment_zero_lat_lon = gpx_file_zero_lat_lon.tracks.first.segments.first
+      assert_equal(189, segment_zero_lat_lon.points.size)
+      assert_equal(1144433525, segment_zero_lat_lon.earliest_point.time.to_i)
+      assert_equal(1144437991, segment_zero_lat_lon.latest_point.time.to_i)
+      assert_equal(1334.447, segment_zero_lat_lon.lowest_point.elevation)
+      assert_equal(1480.087, segment_zero_lat_lon.highest_point.elevation)
+      assert_in_delta(6.98803359528853, segment_zero_lat_lon.distance, 0.001)
+      assert_equal(4466.0, segment_zero_lat_lon.duration)
    end
 
    def test_segment_crop

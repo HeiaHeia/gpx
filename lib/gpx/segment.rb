@@ -49,6 +49,7 @@ module GPX
         if segment_element.is_a?(Nokogiri::XML::Node)
           segment_element.search("trkpt").each do |trkpt|
             pt = TrackPoint.new(:element => trkpt, :segment => self, :gpx_file => @gpx_file)
+            next if pt.lat == 0 && pt.lon == 0
             append_point(pt)
           end
         end
