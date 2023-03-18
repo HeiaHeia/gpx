@@ -1,61 +1,58 @@
-#--
-# Copyright (c) 2006  Doug Fales
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#++
+# frozen_string_literal: true
+
 module GPX
   # In GPX, a single Track can hold multiple Segments, each of which hold
   # multiple points (in this library, those points are instances of
   # TrackPoint).  Each instance of this class has its own meta-data, including
   # low point, high point, and distance.  Of course, each track references an
-  # array of the segments that copmrise it, but additionally each track holds
+  # array of the segments that comprise it, but additionally each track holds
   # a reference to all of its points as one big array called "points".
   class Track < Base
-    attr_reader :points, :bounds, :lowest_point, :highest_point, :distance, :moving_duration, :comment, :description
-    attr_accessor :segments, :name, :gpx_file
+    attr_reader :points, :bounds, :lowest_point, :highest_point, :distance, :moving_duration
+    attr_accessor :segments, :name, :gpx_file, :description, :comment
 
     # Initialize a track from a XML::Node, or, if no :element option is
     # passed, initialize a blank Track object.
     def initialize(opts = {})
+      super()
       @gpx_file = opts[:gpx_file]
       @segments = []
       @points = []
       reset_meta_data
-      if(opts[:element])
-        trk_element = opts[:element]
-        @name = (trk_element.at("name").inner_text rescue "")
-        @comment = (trk_element.at('cmt').inner_text rescue '')
-        @description = (trk_element.at('desc').inner_text rescue '')
-        trk_element.search("trkseg").each do |seg_element|
-          seg = Segment.new(:element => seg_element, :track => self, :gpx_file => @gpx_file)
-          update_meta_data(seg)
-          @segments << seg
-        end
+
+      return unless opts[:element]
+
+      trk_element = opts[:element]
+      @name = (
+      begin
+        trk_element.at('name').inner_text
+      rescue StandardError
+        ''
+      end)
+      @comment = (
+      begin
+        trk_element.at('cmt').inner_text
+      rescue StandardError
+        ''
+      end)
+      @description = (
+      begin
+        trk_element.at('desc').inner_text
+      rescue StandardError
+        ''
+      end)
+      trk_element.search('trkseg').each do |seg_element|
+        seg = Segment.new(element: seg_element, track: self, gpx_file: @gpx_file)
+        append_segment(seg)
       end
     end
 
     # Append a segment to this track, updating its meta data along the way.
     def append_segment(seg)
+      return if seg.points.empty?
+
       update_meta_data(seg)
       @segments << seg
-      @points.concat(seg.points) unless seg.nil?
     end
 
     # Returns true if the given time occurs within any of the segments of this track.
@@ -63,7 +60,7 @@ module GPX
       segments.each do |seg|
         return true if seg.contains_time?(time)
       end
-      return false
+      false
     end
 
     # Finds the closest point (to "time") within this track.  Useful for
@@ -82,7 +79,7 @@ module GPX
         seg.crop(area)
         update_meta_data(seg) unless seg.empty?
       end
-      segments.delete_if { |seg| seg.empty? }
+      segments.delete_if(&:empty?)
     end
 
     # Deletes all points within a given area and updates the meta data.
@@ -92,13 +89,13 @@ module GPX
         seg.delete_area(area)
         update_meta_data(seg) unless seg.empty?
       end
-      segments.delete_if { |seg| seg.empty? }
+      segments.delete_if(&:empty?)
     end
 
     # Returns true if this track has no points in it.  This should return
     # true even when the track has empty segments.
     def empty?
-      (points.nil? or points.size.zero?)
+      (points.nil? || points.size.zero?)
     end
 
     # Prints out a friendly summary of this track (sans points).  Useful for
@@ -115,7 +112,7 @@ module GPX
       result << "\tMoving duration: #{moving_duration} km\n"
       result << "\tLowest Point: #{lowest_point.elevation} \n"
       result << "\tHighest Point: #{highest_point.elevation}\n "
-      result << "\tBounds: #{bounds.to_s}"
+      result << "\tBounds: #{bounds}"
       result
     end
 
@@ -145,6 +142,5 @@ module GPX
       @moving_duration = 0.0
       @points = []
     end
-
   end
 end
