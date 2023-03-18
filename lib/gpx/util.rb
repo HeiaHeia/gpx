@@ -17,6 +17,10 @@ module GPX
     def earlier_time?(a, b)
       return true if a.nil?
       return false if b.nil?
+
+      return true if a.time.nil?
+      return false if b.time.nil?
+
       b.time < a.time
     end
     module_function :earlier_time?
@@ -24,6 +28,10 @@ module GPX
     def latter_time?(a, b)
       return true if a.nil?
       return false if b.nil?
+
+      return true if a.time.nil?
+      return false if b.time.nil?
+
       b.time > a.time
     end
     module_function :latter_time?
