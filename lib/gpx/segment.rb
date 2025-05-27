@@ -63,7 +63,7 @@ module GPX
 
     # Returns true if the given time is within this Segment.
     def contains_time?(time)
-      ((time >= @earliest_point.time) && (time <= @latest_point.time))
+      (time >= @earliest_point.time) && (time <= @latest_point.time)
     rescue StandardError
       false
     end
@@ -106,7 +106,7 @@ module GPX
 
     # Returns true if this Segment has no points.
     def empty?
-      (points.nil? || points.empty?)
+      points.nil? || points.empty?
     end
 
     # Prints out a nice summary of this Segment.
@@ -194,7 +194,7 @@ module GPX
       elsif time <= pts[midpoint].time
         find_closest(pts[0..midpoint], time)
       else
-        find_closest(pts[(midpoint + 1)..-1], time)
+        find_closest(pts[(midpoint + 1)..], time)
       end
     end
 

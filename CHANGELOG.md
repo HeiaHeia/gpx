@@ -1,3 +1,28 @@
+## [1.2.1] - 2025-02-27
+
+  * Changes dependencies, as `CSV` gem was loaded from the standard library, but will no longer be part of the default gems with Ruby 3.4 (#57 via @simonneutert)
+  * Rubocop fix (#58 via @niborg)
+
+## [1.2.0] - 2024-07-26
+
+  * Adds ability to address various GeoJSON properties when performing GeoJSON to GPX conversion. (#53 via @niborg)
+  * Allow anything that responds to `read` for GPXFile input. (#55 via @hiroaki)
+
+## [1.1.1] - 2023-05-19
+
+  * updates CI, minimal Ruby version now 2.7, updates tooling like rubocop and GitHub actions (#54 via @simonneutert)
+  * adds support for Ruby 3.2 (#52 via @simonneutert)
+  * adds UPGRADING.md to document changes between versions
+
+## [1.1.0] - 2023-05-18
+
+  * Specify UTF-8 encoding for XML encoding (#35 via @sh1nduu)
+  * Added GeoJSON conversion (#38 via @tyrauber and @niborg)
+  * Support Ruby 3 (#43 via @LocoDelAssembly)
+  * Fix nil-to-Time comparison (#46 via @frodrigo)
+  * Fix bug when <rte> GPX file does not specify <name> tag (#41 via @niborg)
+  * Drop Ruby 2.5 and 2.6 from CI (#50 via @niborg)
+
 ## [1.0.0] - 2018-03-06
 
   * Fix duplication of points on appending segment to track (#20 via @niborg)

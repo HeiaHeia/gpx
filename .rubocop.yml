@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.7
 
 Style/Alias:
   Enabled: false
@@ -64,6 +64,9 @@ Style/NegatedIf:
 Style/NegatedWhile:
   Enabled: false
   StyleGuide: http://relaxed.ruby.style/#stylenegatedwhile
+
+Style/OptionalBooleanParameter:
+  Enabled: false
 
 Style/ParallelAssignment:
   Enabled: false

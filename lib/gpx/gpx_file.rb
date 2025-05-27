@@ -35,7 +35,7 @@ module GPX
       if opts[:gpx_file] || opts[:gpx_data]
         if opts[:gpx_file]
           gpx_file = opts[:gpx_file]
-          gpx_file = File.open(gpx_file) unless gpx_file.is_a?(File)
+          gpx_file = File.open(gpx_file) unless gpx_file.respond_to?(:read)
           @xml = Nokogiri::XML(gpx_file)
         else
           @xml = Nokogiri::XML(opts[:gpx_data])
@@ -91,7 +91,7 @@ module GPX
       else
         reset_meta_data
         opts.each { |attr_name, value| instance_variable_set("@#{attr_name}", value) }
-        unless @tracks.nil? || @tracks.size.zero?
+        unless @tracks.nil? || @tracks.empty?
           @tracks.each { |trk| update_meta_data(trk) }
           calculate_duration
         end
@@ -194,8 +194,6 @@ module GPX
       @moving_duration = 0.0
     end
 
-    # rubocop:disable Style/OptionalBooleanParameter
-
     # Updates the meta data for this GPX file.  Meta data includes the
     # bounds, the high and low points, and the distance.  This is useful when
     # you modify the GPX data (i.e. by adding or deleting points) and you
@@ -222,7 +220,6 @@ module GPX
       doc = generate_xml_doc
       doc.to_xml
     end
-    # rubocop:enable Style/OptionalBooleanParameter
 
     def inspect
       "<#{self.class.name}:...>"
@@ -341,7 +338,7 @@ module GPX
     # the very first point from the time on the very last point.
     def calculate_duration
       @duration = 0
-      if @tracks.nil? || @tracks.size.zero? || @tracks[0].segments.nil? || @tracks[0].segments.size.zero?
+      if @tracks.nil? || @tracks.empty? || @tracks[0].segments.nil? || @tracks[0].segments.empty?
         return @duration
 
       end
