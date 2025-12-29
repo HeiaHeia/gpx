@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.summary = 'A basic API for reading and writing GPX files.'
   s.description = 'A basic API for reading and writing GPX files.'
 
-  s.required_ruby_version = '>= 2.7', '< 4'
+  s.required_ruby_version = '>= 2.7', '< 5'
 
   s.files = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
@@ -20,9 +20,14 @@ Gem::Specification.new do |s|
 
   s.homepage = 'http://www.github.com/dougfales/gpx'
   s.add_dependency 'csv'
-  s.add_dependency 'nokogiri', '~>1.7'
-  s.add_dependency 'rake'
+  s.add_dependency 'nokogiri', '~>1.19'
   s.add_development_dependency 'bundler'
   s.add_development_dependency 'minitest'
   s.add_development_dependency 'rubocop'
+  s.add_development_dependency 'rdoc'
+  s.add_development_dependency 'base64'
+  s.add_development_dependency 'rake', '>= 13.2'
+  s.add_development_dependency 'mutex_m'
+  s.add_development_dependency 'ostruct'
+  s.add_development_dependency 'benchmark'
 end
